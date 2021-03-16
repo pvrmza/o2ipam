@@ -43,6 +43,15 @@ Site: [Observium homepage](https://www.observium.org/) <---> [phpIPAM homepage](
 
 - Clone this repository en /opt/observium 
 - Edit o2ipam_config.php with app name y api key from phpIPAM or set environment variable with value
+- Add cron job, to export data from Observium to phpIPAM after full discovery job
+
+```
+45  */6   * * *   root    /opt/observium/o2ipam/o2ipam_devices.php
+48  */6   * * *   root    /opt/observium/o2ipam/o2ipam_network.php
+52  */6   * * *   root    /opt/observium/o2ipam/o2ipam_address.php
+58  *     * * *   root    /opt/observium/o2ipam/o2ipam_ipmac.php
+
+```
 
 ## Enviroment Variable
 - phpipam_url
