@@ -3,10 +3,9 @@ Export data from Observium to phpIPAM
 
 Observium is network monitoring with intuition. It is a low-maintenance auto-discovering network monitoring platform supporting a wide range of device types
 
-phpIPAM is an open-source web IP address management (IPAM) and dcim data center infrastructure management (DCIM) software 
+phpIPAM is an open-source web IP address management (IPAM) and Data Center Infrastructure Management (DCIM) software 
 
-
-Together they are two applications that help us keep our inventory updated in real time. 
+Together they are two applications, they make our lives easier 
 
 Observium discovers devices, networks and IP addresses, phpIPAM documents ... and these little bits of code keep the information up to date 
 
