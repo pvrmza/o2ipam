@@ -45,10 +45,10 @@ Site: [Observium homepage](https://www.observium.org/) <---> [phpIPAM homepage](
 - Add cron job, to export data from Observium to phpIPAM after full discovery job
 
 ```
-45  */6   * * *   root    /opt/observium/o2ipam/o2ipam_devices.php
-48  */6   * * *   root    /opt/observium/o2ipam/o2ipam_network.php
-52  */6   * * *   root    /opt/observium/o2ipam/o2ipam_address.php
-58  *     * * *   root    /opt/observium/o2ipam/o2ipam_ipmac.php
+45  */6   * * *   root    /opt/observium/o2ipam/o2ipam_00_devices.php
+48  */6   * * *   root    /opt/observium/o2ipam/o2ipam_01_network.php
+52  */6   * * *   root    /opt/observium/o2ipam/o2ipam_02_address.php
+58  *     * * *   root    /opt/observium/o2ipam/o2ipam_03_ipmac.php
 
 ```
 
