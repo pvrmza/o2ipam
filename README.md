@@ -27,6 +27,8 @@ Site: [Observium homepage](https://www.observium.org/) <---> [phpIPAM homepage](
 
 
 ## Deploy
+ - you can use that [observium docker image that includes o2ipam](https://github.com/pvrmza/docker-observium) ... or by hand yourself
+
  - Define this custom field in phpIPAM in the device section:
 	 - admin_url -> varchar(255)
 	 - observium_url -> varchar(255)
@@ -51,6 +53,8 @@ Site: [Observium homepage](https://www.observium.org/) <---> [phpIPAM homepage](
 58  *     * * *   root    /opt/observium/o2ipam/o2ipam_03_ipmac.php
 
 ```
+
+
 
 ## Enviroment Variable
 - phpipam_url
