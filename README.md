@@ -5,9 +5,9 @@ Observium is network monitoring with intuition. It is a low-maintenance auto-dis
 
 phpIPAM is an open-source web IP address management (IPAM) and Data Center Infrastructure Management (DCIM) software 
 
-Together they are two applications, they make our lives easier 
+These two applications make our lives easier, and if they share and exchange information, even more.
 
-Observium discovers devices, networks and IP addresses, phpIPAM documents ... and these little bits of code keep the information up to date 
+Observium discovers devices, networks and IP addresses, phpIPAM documents networks and IP addresses used, and even documents the racks ... and these little pieces of code keep the information up to date between the two.
 
 Site: [Observium homepage](https://www.observium.org/) <---> [phpIPAM homepage](http://phpipam.net)  
 
