@@ -9,7 +9,8 @@
  * @copyright  GNU GPL v3.0
  *
  */
-include("o2ipam_config.php");
+$base_dir = realpath(dirname(__FILE__) );
+include($base_dir."/include/o2ipam_config.php");
 
 # --------- phpIPAM functions ---------
 #--------------------------------------
@@ -78,7 +79,7 @@ function add_network($network,$description="Agregada a mano") {
             echo "Added subnet $subnet/$mask \n";
         } else {
             //print_r($var);
-            echo "$var[message] \n";
+            echo "Error - $var[message] \n";
         }
         curl_close($ch);
     } else {
@@ -102,7 +103,7 @@ if (!is_null($network)) {
 } else {
 	$sql="SELECT a.ipv4_network,CONCAT('Discovered from device ',c.hostname,' (',c.sysName,') with IP address ',b.ipv4_address) as description FROM ipv4_networks as a, ipv4_addresses as b, devices as c WHERE b.device_id=c.device_id AND a.ipv4_network_id=b.ipv4_network_id AND ipv4_prefixlen!=32 AND ipv4_prefixlen!=0 ORDER BY ipv4_network";
 	foreach (dbFetchRows($sql) as $listdevice) {		
-		$sal=add_network($listdevice[ipv4_network],$listdevice[description]);
+		$sal=add_network($listdevice['ipv4_network'],$listdevice['description']);
 	}
 }
 

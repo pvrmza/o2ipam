@@ -9,7 +9,8 @@
  * @copyright  GNU GPL v3.0
  *
  */
-include("o2ipam_config.php");
+$base_dir = realpath(dirname(__FILE__) );
+include($base_dir."/include/o2ipam_config.php");
 
 # --------- phpIPAM functions ---------
 #--------------------------------------
@@ -108,22 +109,20 @@ function add_addressDevice($network, $address, $hostname="", $port="", $mac="") 
     $ch = curl_init();
     
     $subnetId=search_ipamnetwork($network);
-    if ( $subnetId != 0 ) {
+    $deviceId=get_ipamdeviceID($address);
+
+    // si la red existe y el IP no es de un equipo en el inventario
+    if ( $subnetId != 0 && $deviceId == 0) {
         $now = new DateTime('NOW');
         $params = array(
-            'hostname' => $hostname ,
+            'hostname' => "" ,
             'port' => $port,
             'mac' => $mac,
             'lastSeen' => $now->format('Y-m-d H:i:s'),
             'tag' => '2',            
         );
-        $device_id=get_ipamdeviceID($hostname);
-        if ( $device_id != 0 ) {
-            // update
-            $params['deviceId']=$device_id;        
-        }
-
-
+        
+        
         $addressID=search_ipamaddress($address);
         if ( $addressID != 0 ) {
             // update
@@ -162,7 +161,7 @@ function add_addressDevice($network, $address, $hostname="", $port="", $mac="") 
         }
         curl_close($ch);
     } else {
-        echo "Subnet $network not exist \n" ;
+        echo "Subnet $network not exist OR IP $address is a registered devices \n" ;
     }
 }
 
@@ -170,7 +169,7 @@ function add_addressDevice($network, $address, $hostname="", $port="", $mac="") 
 chdir(dirname($argv[0]));
 $scriptname = basename($argv[0]);
 
-if (count($argv) > 1 )  { 
+if (count($argv) > 4 )  { 
 	$network=$argv[1];
     $address=$argv[2];
     $hostname=$argv[3];
@@ -180,9 +179,9 @@ if (count($argv) > 1 )  {
 	$sal=add_addressDevice($network, $address, $hostname, $port, $mac);
 
 } else {
-	$sql="SELECT a.ipv4_network, b.ipv4_address, d.ifName, c.hostname, d.ifPhysAddress FROM ipv4_networks as a, ipv4_addresses as b, devices as c, ports as d WHERE b.device_id=c.device_id AND a.ipv4_network_id=b.ipv4_network_id AND b.port_id=d.port_id AND ipv4_prefixlen!=32 ORDER BY ipv4_network;";
+	$sql="SELECT a.ipv4_network, c.hostname, d.ifName, e.mac_address, e.ip_address FROM ipv4_networks as a, ipv4_addresses as b, devices as c, ports as d, ip_mac as e WHERE b.device_id=c.device_id AND a.ipv4_network_id=b.ipv4_network_id AND b.port_id=d.port_id AND d.port_id=e.port_id AND ipv4_prefixlen!=32 GROUP BY e.ip_address;";
 	foreach (dbFetchRows($sql) as $listaddress) {		
-		$sal=add_addressDevice($listaddress[ipv4_network], $listaddress[ipv4_address], $listaddress[hostname], $listaddress[ifName], $listaddress[ifPhysAddress]);
+		$sal=add_addressDevice($listaddress['ipv4_network'], $listaddress['ip_address'], $listaddress['hostname'], $listaddress['ifName'], $listaddress['mac_address']);
 	}
 }
 

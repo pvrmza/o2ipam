@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  db:
+    image: mariadb:10.5.2
+    restart: always
+    env_file:
+      - .env_mysql
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306"
+
+  o2ipam:
+    depends_on:
+      - db
+    links:
+      - db:db
+    image: o2ipam
+    #image: pvrmza/docker-observium
+    restart: always
+    env_file:
+      - .env_mysql
+    volumes:
+      - /home/pvr/MEGA/07_desarrollos/o2ipam/o2ipam/files:/var/www/html 
+
+volumes:
+  db_data:
+  
