@@ -15,7 +15,7 @@ include($base_dir."/include/o2ipam_config.php");
 
 # --------- phpIPAM functions ---------
 #--------------------------------------
-function get_ipamdeviceID($cadena="") { 
+function get_ipamdeviceID($cadena="") {
     global  $base_url,$api_key;
 
     $headers    = array(
@@ -36,8 +36,8 @@ function get_ipamdeviceID($cadena="") {
     if ( $var['success'] == "1" ) {
         $array=$var['data'];
         $cant=count($array);
-        
-        if ( $cant > 0 ) {            
+
+        if ( $cant > 0 ) {
             foreach ($array as $clave => $valor) {
                 if ( $cadena == $valor['hostname'] ) {
                     $existe=$valor['id'];
@@ -47,9 +47,10 @@ function get_ipamdeviceID($cadena="") {
                 }
             }
         }
-    }    
+    }
+
     return $existe;
-}	
+}
 function add_ipamDevice($params) {
     global  $base_url,$api_key;
 
@@ -69,12 +70,15 @@ function add_ipamDevice($params) {
 
     $res = curl_exec($ch);
     $var=json_decode($res,true);
-    //print_r($var);    
     $hostname=$params['hostname'];
     $ip_addr=$params['ip_addr'];
 
     if ( $var['success'] == "1" ) {
         echo "Agregado con exito el equipo $hostname con el IP $ip_addr \n";
+    } else {
+        print_r($var);
+        echo "---------- \n";
+        print_r($params);
     }
 
     curl_close($ch);
@@ -88,7 +92,7 @@ function update_ipamDevice($device_id,$params) {
     );
 
     $accion     = "devices";
-    $params[id]=$device_id ;
+    $params['id']=$device_id ;
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "$base_url$accion");
@@ -97,13 +101,11 @@ function update_ipamDevice($device_id,$params) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
 
-    //print_r($params);
-    $hostname=$params[hostname];
-    $ip_addr=$params[ip_addr];
+    $hostname=$params['hostname'];
+    $ip_addr=$params['ip_addr'];
 
     $res = curl_exec($ch);
     $var=json_decode($res,true);
-    //print_r($var);
     if ( $var['success'] == "1" ) {
         echo "Actualizado con exito el equipo $hostname con el IP $ip_addr \n";
     }
@@ -114,50 +116,52 @@ function update_ipamDevice($device_id,$params) {
 # --------- Observium functions ---------
 #---------------------------------------------
 function get_deviceIP($hostname="") {
-	$ip_addr= shell_exec("/usr/bin/fping -A $hostname 2> /dev/null | awk '{ print $1}'");
-	return($ip_addr);
+        $ip_addr= shell_exec("/usr/bin/fping -A $hostname 2> /dev/null | awk '{ printf $1 }'");
+        return(str_replace (array("\r\n", "\n", "\r"), ' ', $ip_addr));
 }
 function get_deviceInfo($deviceID="0") {
     global $observium_url;
-	$sql="SELECT device_id, hostname, snmp_community, snmp_authlevel, snmp_authname, snmp_authpass, snmp_authalgo, snmp_cryptopass, snmp_cryptoalgo, snmp_context, snmp_version, snmp_port, snmp_timeout, snmp_retries, snmp_maxrep, sysDescr, version, hardware, vendor, os, asset_tag, serial FROM devices WHERE device_id='$deviceID' ;";
+        $sql="SELECT device_id, hostname, snmp_community, snmp_authlevel, snmp_authname, snmp_authpass, snmp_authalgo, snmp_cryptopass, snmp_cryptoalgo, snmp_context, snmp_version, snmp_port, snmp_timeout, snmp_retries, snmp_maxrep, sysDescr, version, hardware, vendor, os, asset_tag, serial FROM devices WHERE device_id='$deviceID' ;";
 
-	// List Devices
-	foreach (dbFetchRows($sql) as $device)
-	{
+        // List Devices
+        foreach (dbFetchRows($sql) as $device)
+        {
 
-		$ip_addr=get_deviceIP($device['hostname']);
-		//print_r($device);
-		
-		if ($device['snmp_version']=="v2c") {
-			$device['snmp_version']=2;
-		}
-		if ($device['snmp_version']=="v3") {
-			$device['snmp_version']=3;
-			$device['snmp_community']=$device['snmp_authname'];
-		}
+                $ip_addr=get_deviceIP($device['hostname']);
 
-	    $params = array(
-	                    'ip_addr' 				=> $ip_addr,
-	                    'hostname' 				=> $device['hostname'],
-	                    'custom_observium_id'   => $device['device_id'],
+                if ($device['snmp_version']=="v1") {
+                        $device['snmp_version']=1;
+                }
+                if ($device['snmp_version']=="v2c") {
+                        $device['snmp_version']=2;
+                }
+                if ($device['snmp_version']=="v3") {
+                        $device['snmp_version']=3;
+                        $device['snmp_community']=$device['snmp_authname'];
+                }
+
+            $params = array(
+                            'ip_addr'                           => $ip_addr,
+                            'hostname'                          => $device['hostname'],
+                            'custom_observium_id'   => $device['device_id'],
                         'custom_observium_url'  => $observium_url."device/device=".$device['device_id'],
-	                    'snmp_queries' 			=> "get_system_info;get_arp_table;get_interfaces_ip",
-	                    'snmp_port' 			=> $device['snmp_port'],
-	                    'snmp_version' 			=> $device['snmp_version'],
-	                    'snmp_community' 		=> $device['snmp_community'],
-	                );
-	    if (!(is_null($device['sysDescr'])) )            { $params['description']=$device['sysDescr'] ;}
-	    if (!(is_null($device['snmp_timeout'])))         { $params['snmp_timeout']=$device['snmp_timeout'] ;}
-	    if (!(is_null($device['snmp_authalgo'])))        { $params['snmp_v3_auth_protocol']=$device['snmp_authalgo'] ;}
-	    if (!(is_null($device['snmp_authlevel'])))       { $params['snmp_v3_sec_level']=$device['snmp_authlevel'] ;}
-	    if (!(is_null($device['snmp_v3_auth_pass'])))    { $params['snmp_authpass']=$device['snmp_authpass'] ;}
-	    if (!(is_null($device['vendor'])))               { $params['custom_vendor']=$device['vendor'] ;}
-	    if (!(is_null($device['hardware'])) )            { $params['custom_hardware']=$device['hardware'] ;}	    
-	    if (!(is_null($device['version'])) )             { $params['custom_version']=$device['version'] ;}
-	    if (!(is_null($device['asset_tag'])) )           { $params['custom_asset_tag']=$device['asset_tag'] ;}
-	    if (!(is_null($device['serial'])) )              { $params['custom_serial']=$device['serial'] ;}
+                            'snmp_queries'                      => "get_system_info;get_arp_table;get_interfaces_ip",
+                            'snmp_port'                         => $device['snmp_port'],
+                            'snmp_version'                      => $device['snmp_version'],
+                            'snmp_community'            => $device['snmp_community'],
+                        );
+            if (isset($device['sysDescr']))             { $params['description']=$device['sysDescr'] ;}
+            if (isset($device['snmp_timeout']))         { $params['snmp_timeout']=$device['snmp_timeout'] ;}
+            if (isset($device['snmp_authalgo']))        { $params['snmp_v3_auth_protocol']=$device['snmp_authalgo'] ;}
+            if (isset($device['snmp_authlevel']))       { $params['snmp_v3_sec_level']=$device['snmp_authlevel'] ;}
+            if (isset($device['snmp_v3_auth_pass']))    { $params['snmp_authpass']=$device['snmp_authpass'] ;}
+            if (isset($device['vendor']))               { $params['custom_vendor']=$device['vendor'] ;}
+            if (isset($device['hardware']))             { $params['custom_hardware']=$device['hardware'] ;}
+            if (isset($device['version']))              { $params['custom_version']=$device['version'] ;}
+            if (isset($device['asset_tag']))            { $params['custom_asset_tag']=$device['asset_tag'] ;}
+            if (isset($device['serial']))               { $params['custom_serial']=$device['serial'] ;}
 
-        if (!(is_null($device['os'])) )                  { 
+        if (!(is_null($device['os'])) )                  {
             $params['custom_os']=$device['os'];
             if ($device['os']=="routeros") {
                 $params['custom_admin_url']="winbox://".$device['hostname'];
@@ -169,59 +173,59 @@ function get_deviceInfo($deviceID="0") {
                 $params['custom_admin_url']="https://".$device['hostname'];
             }
         }
-
-	    return($params);
-
-	}
+            return($params);
+        }
 }
 
 function add_deviceID($deviceID) {
     // get info
-	$info=get_deviceInfo($deviceID);
+        $info=get_deviceInfo($deviceID);
 
-	$ip_addr=$info['ip_addr'];
-	$hostname=$info['hostname'];
-    
-	if (!is_null($hostname)) {
+        $ip_addr=$info['ip_addr'];
+        $hostname=$info['hostname'];
+
+        if (!is_null($hostname)) {
         // check exist by hostname
-		$id=get_ipamdeviceID($hostname);
-		if ( $id != "0" ) {
-            // update
-			//echo "El dispositivo $hostname existe en IPAM con el ID $id\n";
-			update_ipamDevice($id,$info);
-			return 0;
-		} 
-        // check exist by ip address
-		$id=get_ipamdeviceID($ip_addr);
-		if ( $id != "0" ) {
-            // update
-			//echo "El dispositivo $hostname existe en IPAM con el IP $ip_addr con el ID $id\n";
-			update_ipamDevice($id,$info);
-			return 0;
-		} 
-        // add device
-        //echo "Agregando el disposifivo $hostname \n";
-		add_ipamDevice($info);
-	} else {
-		echo "El dispositivo $deviceID no existe en Observium \n";
-	}
+                $id=get_ipamdeviceID($hostname);
+                if ( $id != "0" ) {
+                        // update
+                        //echo "El dispositivo $hostname existe en IPAM con el ID $id\n";
+                        update_ipamDevice($id,$info);
+                        return 0;
+                }
+                // check exist by ip address
+                $id=get_ipamdeviceID($ip_addr);
+                if ( $id != "0" ) {
+                        // update
+                        //echo "El dispositivo $hostname existe en IPAM con el IP $ip_addr con el ID $id\n";
+                        update_ipamDevice($id,$info);
+                        return 0;
+                }
+                // add device
+                //echo "Agregando el disposifivo $hostname \n";
+                add_ipamDevice($info);
+        } else {
+                echo "El dispositivo $deviceID no existe en Observium \n";
+        }
 }
 
 #---------------------------------------------------------
 chdir(dirname($argv[0]));
 $scriptname = basename($argv[0]);
 
-if (count($argv) > 1)  { 
-	$deviceID=$argv[1];
+if (count($argv) > 1)  {
+        $deviceID=$argv[1];
 }
 
-if (!is_null($deviceID)) {
-	$sal=add_deviceID($deviceID);
+if (isset($deviceID)) {
+        $sal=add_deviceID($deviceID);
 } else {
-	$sql="SELECT device_id FROM devices ORDER BY `last_discovered_timetaken` ASC;";
-	foreach (dbFetchRows($sql) as $listdevice) {		
-		$sal=add_deviceID($listdevice['device_id']);
-	}
+        //$sql="SELECT device_id FROM devices ORDER BY `last_discovered_timetaken` ASC";
+        $sql="SELECT device_id FROM devices ORDER BY RAND() ASC";
+        foreach (dbFetchRows($sql) as $listdevice) {
+                echo "device -> ". $listdevice['device_id'] ." ";
+                $sal=add_deviceID($listdevice['device_id']);
+        }
 }
 
 ?>
