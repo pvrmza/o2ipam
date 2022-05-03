@@ -41,7 +41,7 @@ function search_ipamnetwork($network) {
 }
 #---------------------------------------------------------
 function add_network($network,$description="Agregada a mano") {
-    global  $base_url,$api_key,$default_section;
+    global  $base_url,$api_key,$phpipam_default_section;
     // check exist
     $existe=search_ipamnetwork($network);
 
@@ -55,7 +55,7 @@ function add_network($network,$description="Agregada a mano") {
         $params = array(
             'subnet' => $subnet,
             'mask' => $mask,
-            'sectionId' => $default_section ,
+            'sectionId' => $phpipam_default_section ,
             'description' => $description,
         );
 
@@ -98,7 +98,7 @@ if (count($argv) > 1)  {
     $description=$argv[2];
 }
 
-if (!is_null($network)) {
+if (isset($network)) {
 	$sal=add_network($network,$description);
 } else {
 	$sql="SELECT a.ipv4_network,CONCAT('Discovered from device ',c.hostname,' (',c.sysName,') with IP address ',b.ipv4_address) as description FROM ipv4_networks as a, ipv4_addresses as b, devices as c WHERE b.device_id=c.device_id AND a.ipv4_network_id=b.ipv4_network_id AND ipv4_prefixlen!=32 AND ipv4_prefixlen!=0 ORDER BY ipv4_network";
