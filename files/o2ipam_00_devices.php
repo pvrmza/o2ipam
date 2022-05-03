@@ -16,11 +16,11 @@ include($base_dir."/include/o2ipam_config.php");
 # --------- phpIPAM functions ---------
 #--------------------------------------
 function get_ipamdeviceID($cadena="") {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
 
     $headers    = array(
         'Content-Type: application/json',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
       );
     $accion     = "devices/search/$cadena";
     $url        = "$base_url$accion";
@@ -52,23 +52,23 @@ function get_ipamdeviceID($cadena="") {
     return $existe;
 }
 function add_ipamDevice($params) {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
 
-    $headers = array(
+    $headers=array(
         'Content-Type: multipart/form-data',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
     );
 
-    $accion     = "devices";
+    $accion="devices";
 
-    $ch = curl_init();
+    $ch=curl_init();
     curl_setopt($ch, CURLOPT_URL, "$base_url$accion");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
 
-    $res = curl_exec($ch);
+    $res=curl_exec($ch);
     $var=json_decode($res,true);
     $hostname=$params['hostname'];
     $ip_addr=$params['ip_addr'];
@@ -85,10 +85,10 @@ function add_ipamDevice($params) {
 }
 #---------------------------------------------
 function update_ipamDevice($device_id,$params) {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
     $headers = array(
         'Content-Type: multipart/form-data',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
     );
 
     $accion     = "devices";
@@ -223,7 +223,6 @@ if (isset($deviceID)) {
         //$sql="SELECT device_id FROM devices ORDER BY `last_discovered_timetaken` ASC";
         $sql="SELECT device_id FROM devices ORDER BY RAND() ASC";
         foreach (dbFetchRows($sql) as $listdevice) {
-                echo "device -> ". $listdevice['device_id'] ." ";
                 $sal=add_deviceID($listdevice['device_id']);
         }
 }

@@ -15,10 +15,10 @@ include($base_dir."/include/o2ipam_config.php");
 # --------- phpIPAM functions ---------
 #--------------------------------------
 function search_ipamnetwork($network) {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
     $headers    = array(
         'Content-Type: application/json',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
       );
     $accion     = "subnets/search/$network";
     $url        = "$base_url$accion";
@@ -42,10 +42,10 @@ function search_ipamnetwork($network) {
 }
 #--------------------------------------
 function search_ipamaddress($address) {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
     $headers    = array(
         'Content-Type: application/json',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
       );
     $accion     = "addresses/search/$address/";
     $url        = "$base_url$accion";
@@ -69,11 +69,11 @@ function search_ipamaddress($address) {
 }
 #--------------------------------------
 function get_ipamdeviceID($cadena="") { 
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
 
     $headers    = array(
         'Content-Type: application/json',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
       );
     $accion     = "devices/search/$cadena";
     $url        = "$base_url$accion";
@@ -105,7 +105,7 @@ function get_ipamdeviceID($cadena="") {
 }   
 #---------------------------------------------------------
 function add_addressDevice($network, $address, $hostname="", $port="", $mac="") {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
     $ch = curl_init();
     
     $subnetId=search_ipamnetwork($network);
@@ -139,7 +139,7 @@ function add_addressDevice($network, $address, $hostname="", $port="", $mac="") 
 
         $headers = array(
             'Content-Type: multipart/form-data',
-            sprintf('token: %s', $api_key)
+            sprintf('token: %s', $phpipam_api_key)
         );
 
         $accion     = "addresses";

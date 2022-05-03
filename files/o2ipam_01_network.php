@@ -15,10 +15,10 @@ include($base_dir."/include/o2ipam_config.php");
 # --------- phpIPAM functions ---------
 #--------------------------------------
 function search_ipamnetwork($network) {
-    global  $base_url,$api_key;
+    global  $base_url,$phpipam_api_key;
     $headers    = array(
         'Content-Type: application/json',
-        sprintf('token: %s', $api_key)
+        sprintf('token: %s', $phpipam_api_key)
       );
     $accion     = "subnets/search/$network";
     $url        = "$base_url$accion";
@@ -41,7 +41,7 @@ function search_ipamnetwork($network) {
 }
 #---------------------------------------------------------
 function add_network($network,$description="Agregada a mano") {
-    global  $base_url,$api_key,$phpipam_default_section;
+    global  $base_url,$phpipam_api_key,$phpipam_default_section;
     // check exist
     $existe=search_ipamnetwork($network);
 
@@ -61,7 +61,7 @@ function add_network($network,$description="Agregada a mano") {
 
         $headers = array(
             'Content-Type: multipart/form-data',
-            sprintf('token: %s', $api_key)
+            sprintf('token: %s', $phpipam_api_key)
         );
 
         $accion     = "subnets";
