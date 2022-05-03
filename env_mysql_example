@@ -1,5 +1,0 @@
-MYSQL_DATABASE=observium
-MYSQL_PASSWORD=observiumpwd
-MYSQL_ROOT_PASSWORD=9459123fdf62cc04
-MYSQL_USER=observium
-TZ=America/Argentina/Mendoza

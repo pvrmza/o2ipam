@@ -1,0 +1,16 @@
+phpipam_url=https://phpipam.local/
+phpipam_api_app_id=api_name
+phpipam_api_key=my_api_key
+
+# default section for discovered network
+phpipam_default_section=13
+
+# Observium URL
+observium_url=https://observium.local/
+
+db_host=db_host
+db_user=observium
+db_pass=ChangeIT!
+db_name=observium
+
+TZ=America/Argentina/Mendoza
