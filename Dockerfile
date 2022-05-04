@@ -5,10 +5,11 @@ LABEL maintainer="Pablo A. Vargas <pablo@pampa.cloud>"
 RUN apk update && apk add php8 php8-mysqli php8-mbstring php8-curl fping curl
 
 COPY files/ /var/www/html
-COPY files/entry.sh /entry.sh
+COPY script/entry.sh /usr/bin/entry.sh
+COPY script/cron-o2ipam /tmp/cron-o2ipam
 
-RUN crontab /var/www/html/cron-o2ipam && \    
+RUN crontab /tmp/cron-o2ipam && \    
     touch /var/log/cron.log && \
-    chmod 755  /entry.sh
+    chmod 755  /usr/bin/entry.sh
 
-CMD ["/entry.sh"]
+CMD ["/usr/bin/entry.sh"]
