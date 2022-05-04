@@ -116,7 +116,7 @@ function update_ipamDevice($device_id,$params) {
 # --------- Observium functions ---------
 #---------------------------------------------
 function get_deviceIP($hostname="") {
-        $ip_addr= shell_exec("/usr/bin/fping -A $hostname 2> /dev/null | awk '{ printf $1 }'");
+        $ip_addr= shell_exec("fping -A $hostname 2> /dev/null | awk '{ printf $1 }'");
         return(str_replace (array("\r\n", "\n", "\r"), ' ', $ip_addr));
 }
 function get_deviceInfo($deviceID="0") {
